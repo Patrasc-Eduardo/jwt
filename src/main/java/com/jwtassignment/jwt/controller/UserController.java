@@ -1,0 +1,54 @@
+package com.jwtassignment.jwt.controller;
+
+import com.jwtassignment.jwt.model.User;
+import com.jwtassignment.jwt.payload.request.AuthenticationRequest;
+import com.jwtassignment.jwt.payload.response.AuthenticationResponse;
+import com.jwtassignment.jwt.util.JWTUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
+
+@RestController
+@RequiredArgsConstructor
+public class UserController {
+    private  final JWTUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final JWTUtil jwtTokenUtil;
+    private final UserDetailsService userDetailsService;
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+    @PostMapping(value = "/auth")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect username or password");
+        }
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
+        final String jwt = jwtTokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
+
+    @PostMapping(value = "/register")
+    public String registerUser(@RequestBody AuthenticationRequest authenticationRequest) {
+        User user = new User();
+        user.setEmail(authenticationRequest.getEmail());
+        user.setUsername(authenticationRequest.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(authenticationRequest.getPassword()));
+        return "The user was created.";
+    }
+}
