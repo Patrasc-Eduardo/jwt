@@ -33,9 +33,6 @@ public class UserController {
   public ResponseEntity<?> createAuthenticationToken(
       @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
     try {
-      System.err.println(authenticationRequest.toString());
-      System.err.println(authenticationRequest.getUsername());
-      System.err.println(authenticationRequest.getPassword());
       Authentication authentication =
           authenticationManager.authenticate(
               new UsernamePasswordAuthenticationToken(
@@ -48,10 +45,8 @@ public class UserController {
     }
     final UserDetails userDetails =
         userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-    System.err.println(userDetails.toString());
 
     final String jwt = jwtTokenUtil.generateToken(userDetails);
-    System.err.println(jwt);
     return ResponseEntity.ok(new AuthenticationResponse(jwt));
   }
 
@@ -60,7 +55,6 @@ public class UserController {
     User user = new User();
     user.setUsername(authenticationRequest.getUsername());
     user.setPassword(bCryptPasswordEncoder.encode(authenticationRequest.getPassword()));
-    System.err.println("Passwd " + user.getPassword());
     return "The user was created.";
   }
 }
