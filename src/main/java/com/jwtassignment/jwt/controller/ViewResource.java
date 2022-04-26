@@ -8,9 +8,9 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 @RequiredArgsConstructor
 public class ViewResource {
-    @RequestMapping({"view"})
-    public ModelAndView firstPage() {
-        ModelAndView modelAndView = new ModelAndView("view");
-        return modelAndView;
-    }
+  @RequestMapping({"view"})
+  public ModelAndView firstPage() {
+    ModelAndView modelAndView = new ModelAndView("view");
+    return modelAndView;
+  }
 }
