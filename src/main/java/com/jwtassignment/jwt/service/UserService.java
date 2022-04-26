@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,6 +14,7 @@ import java.util.*;
 public class UserService implements UserDetailsService {
   // userRepo simulation
   private final Map<String, String> userDetails = new HashMap<>();
+  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
   public UserService() {
     userDetails.put("Ana", "anapasswd");
@@ -22,7 +24,7 @@ public class UserService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
-    return new User(username, userDetails.get(username), authorities);
+    return new User(username, bCryptPasswordEncoder.encode(userDetails.get(username)), authorities);
   }
 
 }
