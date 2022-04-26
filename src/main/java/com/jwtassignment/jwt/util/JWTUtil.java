@@ -19,10 +19,6 @@ public class JWTUtil {
     return extractClaim(token, Claims::getSubject);
   }
 
-  public String extractEmail(String token) {
-    return extractClaim(token, Claims::getSubject);
-  }
-
   public Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
   }
@@ -57,7 +53,7 @@ public class JWTUtil {
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) throws JWTException {
-    final String username = extractEmail(token);
+    final String username = extractUsername(token);
     if (!username.equals((userDetails.getUsername()))) {
       throw new JWTException(username, "token is not valid.");
     }
